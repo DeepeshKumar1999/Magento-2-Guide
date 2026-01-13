@@ -1,0 +1,157 @@
+MAGENTO 2 CODING STANDARD & QUALITY CHECKLIST
+============================================
+
+1. ARCHITECTURE & SERVICE CONTRACTS
+----------------------------------
+- Verify all Models, ResourceModels, Collections, and Repositories.
+- Ensure proper usage of Service Contracts:
+  - Interfaces in Api/
+  - Data Interfaces in Api/Data/
+  - Avoid exposing Models directly.
+- Confirm repositories return interfaces, not concrete classes.
+
+2. DATA INTERFACES (GETTERS & SETTERS)
+-------------------------------------
+- Validate that all getter and setter methods:
+  - Exist for every database table column.
+  - Match column names, data types, and nullability.
+  - Follow Magento naming conventions:
+    - getFieldName()
+    - setFieldName($value)
+
+3. PHPDOC & DOCUMENTATION
+-------------------------
+- Replace all undocumented methods, classes, and properties with proper PHPDoc blocks.
+- Every PHPDoc must clearly describe:
+  - Purpose of the class or method
+  - Parameters
+  - Return types
+- Avoid undocumented blocks such as:
+  /** Undocumented */
+
+4. OBJECT MANAGER USAGE
+----------------------
+- Remove direct usage of ObjectManager from PHP and PHTML files.
+- Use constructor dependency injection or ViewModels instead.
+- Disallowed usage:
+  \Magento\Framework\App\ObjectManager::getInstance()
+
+5. $this IN PHPDOC
+-----------------
+- Do not use $this in PHPDoc annotations.
+- Replace with the actual class name.
+- Avoid:
+  @return $this
+  @var $this
+- Use:
+  @return \Vendor\ReturnRequest\Model\Example
+
+6. PROPER TYPE DECLARATIONS
+--------------------------
+- Avoid vague or generic types.
+- Disallowed:
+  @return $mixed
+  @var $mixed
+  @param object
+- Use:
+  @return string|null
+  @var \Vendor\ReturnRequest\Api\Data\RequestInterface
+  @param \Magento\Sales\Api\Data\OrderInterface $order
+
+7. INHERITDOC USAGE
+------------------
+- Remove @inheritdoc annotations.
+- Replace them with explicit and descriptive PHPDoc blocks.
+- Ensure documentation is readable without inheritance context.
+
+8. JAVASCRIPT IN PHTML FILES
+---------------------------
+- Do not use require() directly inside PHTML files.
+- Move JavaScript logic to:
+  view/frontend/web/js/*.js
+- Load scripts via requirejs-config.js or layout XML.
+- Avoid:
+  require([
+
+9. CSS SEPARATION
+----------------
+- Remove inline and internal CSS from PHP and PHTML files.
+- Avoid:
+  style="..."
+- Place styles in:
+  - view/frontend/web/css/*.css
+  - view/adminhtml/web/css/*.css
+
+10. DEBUG CODE CLEANUP
+---------------------
+- Remove all debugging statements.
+- Disallowed:
+  console.log()
+
+11. JSON SERIALIZATION
+---------------------
+- Use the Magento-recommended JSON serializer:
+  \Magento\Framework\Serialize\Serializer\Json
+- Avoid:
+  \Magento\Framework\Json\Helper\Data
+
+12. ESCAPING & SECURITY
+----------------------
+- Verify proper usage of Magento Escaper methods:
+  - escapeHtml
+  - escapeUrl
+  - escapeJs
+  - escapeJsQuote
+- Minimize or eliminate usage of:
+  /* @noEscape */
+- Ensure output is escaped unless explicitly safe.
+
+13. FORBIDDEN PHP STATEMENTS
+---------------------------
+- Remove hard-stop debugging functions:
+  die();
+  dd();
+  exit();
+
+14. PHP RETURN TYPES
+-------------------
+- Manually verify all method return types.
+- Add or correct:
+  - PHP return type hints
+  - PHPDoc @return annotations
+- Ensure consistency between actual returns and declared types.
+
+15. PHPSTAN ANALYSIS (DEFAULT CONFIG)
+------------------------------------
+Run:
+php vendor/bin/phpstan analyse -c phpstan.neon app/code/Vendor/ReturnRequest
+
+16. PHPSTAN LEVEL 5 COMPLIANCE
+-----------------------------
+Run:
+php vendor/bin/phpstan analyse -l 5 app/code/Vendor/ReturnRequest
+
+17. MAGENTO CODING STANDARDS (PHPCS)
+-----------------------------------
+Run:
+php vendor/bin/phpcs --standard=Magento2 app/code/Vendor/ReturnRequest
+
+18. DB SCHEMA WHITELIST
+----------------------
+Generate or update DB schema whitelist:
+php bin/magento setup:db-declaration:generate-whitelist --module-name=Vendor_ReturnRequest
+
+19. TRANSLATION FILES
+--------------------
+Collect and update translation phrases:
+php bin/magento i18n:collect-phrases \
+  --output="app/code/Vendor/ReturnRequest/i18n/en_US.csv" \
+  app/code/Vendor/ReturnRequest
+
+FINAL OUTCOME
+-------------
+After completing this checklist, the module should:
+- Follow Magento 2 architectural best practices
+- Pass PHPStan Level 5
+- Comply with Magento 2 coding standards
+- Be secure, maintainable, and production-ready
